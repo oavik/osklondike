@@ -3,10 +3,191 @@
 <meta charset="utf-8">
 <title>Klondike</title>
 <style type="text/css">
+span { margin: 0; padding: 0; }
+div { padding: 0; }
+#upper { height: 240px; }
+#upper div { display: inline-block; }
+#deck { width: 100px; height: 120px; }
+#waste { width: 200px; height: 120px; }
+#waste span { top: 0; }
+#waste > span + span { margin-left: -80px; }
+#foundation { width: 440px; height: 120px; float: right; }
+#foundation > span + span { padding-left: 10px; }
+#tableau { width: 770px; height: 120px; }
+#tableau div { width: 100px; display: inline-block; float: left; }
+#tableau > div > span { left: 0; }
+#tableau > div > span + span { margin-top: 20px; }
+.card { background: white; width: 100px; height: 120px; display: inline-block; border: thin solid black; }
+.facedown { background: blue; }
+.clubs, .spades { color: black; }
+.hearts, .diams { color: red; }
 </style>
 <script type="text/javascript">
+var suits = [ "hearts", "clubs", "diams", "spades" ];
+var values = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];
+var game = { deck: new Array(), waste: new Array(), tableau: new Array(), foundation: new Array() };
+
+var Card = function(suit, value) {
+	return {
+		suit: suits[suit],
+		value: values[value],
+		faceup: false
+	};
+};
+
+function movetofoundation(e) {
+	console.log(this.id);
+}
+
+function makecard(card) {
+	var c = document.createElement("span");
+	if (!card.faceup) {
+		c.className = "card facedown";
+		return c;
+	}
+	c.className = "card " + card.suit;
+	c.id = card.suit + "-" + card.value;
+	c.onclick = movetofoundation;
+	c.draggable = true;
+	c.ondragstart = drag;
+	c.addEventListener("doubleclick", movetofoundation);
+	c.innerHTML = card.value + "<br>&" + card.suit + ";";
+	return c;
+}
+
+function cardfromid(id) {
+	var card = id.split("-");
+	return { suit: card[0], value: card[1] };
+}
+
+function drag(e) {
+	e.dataTransfer.setData("text", e.target.id);
+}
+
+function dropfoundation(e) {
+	e.preventDefault();
+	
+	var target = cardfromid(this.id);
+
+	if (target.suit == "f") {
+		foundation = parseInt(target[1]);
+	} else {
+		// find the card being dropped upon
+	}
+
+	var card = cardfromid(e.dataTransfer.getData("text"));
+	console.log(card);
+	//console.log(e);
+	//console.log(this);
+}
+
+function allowdrop(e) {
+	e.preventDefault();
+	var target = cardfromid(this.id);
+	var card = cardfromid(e.dataTransfer.getData("text"));
+	console.log("trying to drop " + card.value + " of " + card.suit + " on " + target.value + " of " + target.suit);
+	if (target.suit == "f" && card.value == "A") {
+		return true;
+	}
+	if (target.suit == card.suit && values.indexOf(target.value) == values.indexOf(card.value) + 1) {
+		return true;
+	}
+	return false;
+}
+
+function showcards() {
+	var i;
+	var deck = document.getElementById("deck");
+	deck.className = (game.deck.length > 0 ? "card facedown" : "card");
+
+	var waste = document.getElementById("waste");
+	waste.innerHTML = "";
+	for (i = Math.max(game.waste.length - 3, 0); i < game.waste.length; i++) {
+		var c = makecard(game.waste[i]);
+		waste.appendChild(c);
+	}
+	
+	var foundation = document.getElementById("foundation");
+	foundation.innerHTML = "";
+	for (i = 0; i < 4; i++) {
+		if (game.foundation[i].length > 0) {
+			foundation.appendChild(makecard(game.foundation[i][game.foundation[i].length-1]));
+		} else {
+			var empty = document.createElement("span");
+			empty.id = "f-" + i;
+			empty.className = "card";
+			foundation.appendChild(empty);
+		}
+		foundation.childNodes[i].ondrop = dropfoundation;
+		foundation.childNodes[i].ondragover = allowdrop;
+	}
+
+	var tableau = document.getElementById("tableau");
+	tableau.innerHTML = "";
+	for (i = 0; i < 7; i++) {
+		var stack = document.createElement("div");
+		for (var j = 0; j < game.tableau[i].length; j++) {
+			stack.appendChild(makecard(game.tableau[i][j]));
+		}
+			tableau.appendChild(stack);
+	}
+}
+
+function draw(e) {
+	e.preventDefault();
+	if (game.deck.length == 0) {
+		while (game.waste.length > 0) {
+			game.deck.push(game.waste.pop());
+			game.deck[game.deck.length-1].faceup = false;
+		}
+	}
+	for (var i = 0; i < Math.min(game.deck.length, 3); i++) {
+		game.waste.push(game.deck.pop());
+		game.waste[game.waste.length-1].faceup = true;
+	}
+	showcards();
+}
+
+function init() {
+	for (var s = 0; s < suits.length; s++) {
+		for (var v = 0; v < values.length; v++) {
+			game.deck.push(new Card(s, v));
+		}
+	}
+
+	for (var i = 0; i < game.deck.length; i++) {
+		var swap = Math.floor(Math.random() * game.deck.length);
+		var old = game.deck[i];
+		game.deck[i] = game.deck[swap];
+		game.deck[swap] = old;
+	}
+
+	for (i = 0; i < 4; i++) {
+		game.foundation[i] = new Array();
+	}
+
+	for (i = 0; i < 7; i++) {
+		game.tableau[i] = new Array();
+		for (var j = 6 - i; j < 7; j++) {
+			game.tableau[i].push(game.deck.pop());
+		}
+		game.tableau[i][game.tableau[i].length - 1].faceup = true;
+	}
+
+	document.getElementById("deck").addEventListener("click", draw);
+
+	showcards();
+}
+
 </script>
 </head>
-<body>
+<body onload="init();">
+<div id="upper">
+	<div id="deck"></div>
+	<div id="waste"></div>
+	<div id="foundation"></div>
+</div>
+<div id="tableau">
+</div>
 </body>
 </html>
