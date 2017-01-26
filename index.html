@@ -3,6 +3,8 @@
 <meta charset="utf-8">
 <title>Klondike</title>
 <style type="text/css">
+body { background: darkgreen; }
+
 span { margin: 0; padding: 0; }
 div { padding: 0; }
 #upper { height: 240px; }
@@ -19,9 +21,8 @@ div { padding: 0; }
 
 #tableau { width: 770px; height: 120px; }
 #tableau div { width: 100px; display: inline-block; float: left; padding-left: 10px; }
-#tableau > .card + .card{ display: inline-block; margin-top: -100px; }
 
-.card { background: white; width: 100px; height: 120px; display: inline-block; border: thin solid black; }
+.card { background: white; width: 100px; height: 120px; display: inline-block; border: thin solid white; }
 .facedown { background: blue; }
 .clubs, .spades { color: black; }
 .hearts, .diams { color: red; }
@@ -97,12 +98,12 @@ function init() {
 	deck.addEventListener("click", draw);
 
 	var tableau = document.getElementById("tableau");
-	console.log("t:" + tableau.childNodes.length);
 	for (var t = 0; t < 7; t++) {
 		for (var c = 6 - t; c < 7; c++) {
 			var card = deck.lastChild;
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
+			card.style.marginTop = "-100px";
 		}
 		tableau.childNodes[t].lastChild.flip();
 	}
@@ -114,12 +115,7 @@ function init() {
 <div id="upper">
 	<div id="deck"></div>
 	<div id="waste"></div>
-	<div id="foundation">
-		<div id="f0"></div>
-		<div id="f1"></div>
-		<div id="f2"></div>
-		<div id="f3"></div>
-	</div>
+	<div id="foundation"><div></div><div></div><div></div><div></div></div>
 </div>
 <div id="tableau"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </body>
