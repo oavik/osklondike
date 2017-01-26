@@ -16,8 +16,9 @@ div { padding: 0; }
 #waste { width: 200px; height: 120px; }
 #waste .card { position: absolute; top: 0; }
 
-#foundation { width: 460px; height: 120px; float: right; }
+#foundation { float: right; } 
 #foundation div { width: 100px; height: 120px; border: thin solid black; padding-left: 10px; }
+#foundation .card { position: relative; top: 0; }
 
 #tableau { width: 770px; height: 120px; }
 #tableau div { width: 100px; display: inline-block; float: left; padding-left: 10px; }
@@ -31,24 +32,39 @@ div { padding: 0; }
 var suits = [ "hearts", "clubs", "diams", "spades" ];
 var values = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];
 
+function movetofoundation(e) {
+	var f = document.getElementById("foundation");
+	for (var i = 0; i < 4; i++) {
+		if (f.childNodes[i].childNodes.length == this.value && (this.value == 0 || this.suit == f.childNodes[i].lastChild.suit)) {
+			var from = this.parentNode;
+			from.removeChild(this);
+			if (from.childNodes.length > 0 && from.lastChild.facedown) {
+				from.lastChild.flip();
+			}
+			f.childNodes[i].appendChild(this);
+		}
+	}
+}
+
 var Card = function(suit, value) {
 	var c = document.createElement("span");
 	c.id = suits[suit] + "-" + values[value];
-	c.suit = suits[suit];
-	c.value = values[value];
+	c.suit = suit;
+	c.value = value;
 	c.draggable = false;
 	c.faceup = true;
-	c.toString = function () { return this.value + " of " + this.suit; };
 	c.flip = function() {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
-			this.className = "card " + this.suit;
-			this.innerHTML = this.value + "<br>&" + this.suit +";";
+			this.className = "card " + suits[this.suit];
+			this.innerHTML = values[this.value] + "<br>&" + suits[this.suit] +";";
 			this.draggable = true;
+			this.addEventListener("click", movetofoundation);
 		} else {
 			this.className = "card facedown";
 			this.innerHTML = "";
 			this.draggable = false;
+			this.removeEventListener("click", movetofoundation);
 		}
 	};
 	c.flip();
