@@ -18,9 +18,8 @@ div { padding: 0; }
 #foundation div { width: 100px; height: 120px; border: thin solid black; padding-left: 10px; }
 
 #tableau { width: 770px; height: 120px; }
-#tableau div { width: 100px; display: inline-block; float: left; }
-#tableau > div > span { left: 0; }
-#tableau > div > span + span { margin-top: 20px; }
+#tableau div { width: 100px; display: inline-block; float: left; padding-left: 10px; }
+#tableau > .card + .card{ display: inline-block; margin-top: -100px; }
 
 .card { background: white; width: 100px; height: 120px; display: inline-block; border: thin solid black; }
 .facedown { background: blue; }
@@ -30,7 +29,6 @@ div { padding: 0; }
 <script type="text/javascript">
 var suits = [ "hearts", "clubs", "diams", "spades" ];
 var values = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];
-var game = { deck: new Array(), waste: new Array(), tableau: new Array(), foundation: new Array() };
 
 var Card = function(suit, value) {
 	var c = document.createElement("span");
@@ -97,6 +95,17 @@ function init() {
 		cards.splice(card, 1);
 	}
 	deck.addEventListener("click", draw);
+
+	var tableau = document.getElementById("tableau");
+	console.log("t:" + tableau.childNodes.length);
+	for (var t = 0; t < 7; t++) {
+		for (var c = 6 - t; c < 7; c++) {
+			var card = deck.lastChild;
+			deck.removeChild(card);
+			tableau.childNodes[t].appendChild(card);
+		}
+		tableau.childNodes[t].lastChild.flip();
+	}
 }
 
 </script>
@@ -112,14 +121,6 @@ function init() {
 		<div id="f3"></div>
 	</div>
 </div>
-<div id="tableau">
-	<div id="t0"></div>
-	<div id="t1"></div>
-	<div id="t2"></div>
-	<div id="t3"></div>
-	<div id="t4"></div>
-	<div id="t5"></div>
-	<div id="t6"></div>
-</div>
+<div id="tableau"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </body>
 </html>
