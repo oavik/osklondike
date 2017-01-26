@@ -21,10 +21,10 @@ div { padding: 0; }
 #foundation .card { position: relative; top: 0; }
 
 #tableau { width: 770px; height: 120px; }
-#tableau div { width: 100px; display: inline-block; float: left; padding-left: 10px; }
+#tableau div { width: 100px; display: inline-block; padding-left: 10px; vertical-align: top; }
 
-.card { background: white; width: 100px; height: 120px; display: inline-block; border: thin solid white; }
-.facedown { background: blue; }
+.card { background: white; width: 100px; height: 120px; display: inline-block; border: thin solid black; }
+.facedown { background: blue; border: thin solid white;}
 .clubs, .spades { color: black; }
 .hearts, .diams { color: red; }
 </style>
@@ -37,10 +37,10 @@ function movetofoundation(e) {
 	for (var i = 0; i < 4; i++) {
 		if (f.childNodes[i].childNodes.length == this.value && (this.value == 0 || this.suit == f.childNodes[i].lastChild.suit)) {
 			var from = this.parentNode;
-			from.removeChild(this);
-			if (from.childNodes.length > 0 && from.lastChild.facedown) {
-				from.lastChild.flip();
+			if (this.previousSibling && this.previousSibling.faceup == false) {
+				this.previousSibling.flip();
 			}
+			from.removeChild(this);
 			f.childNodes[i].appendChild(this);
 		}
 	}
