@@ -66,11 +66,11 @@ function drop(e) {
 
 function dragover(e) {
 	e.preventDefault();
-	e.returnValue = canmove(window.dragging, e.target);
+	//e.returnValue = canmove(window.dragging, e.target);
 }
 
 var Card = function(suit, value) {
-	var c = document.createElement("span");
+	var c = document.createElement("div");
 	c.id = suits[suit] + "-" + values[value];
 	c.suit = suit;
 	c.value = value;
