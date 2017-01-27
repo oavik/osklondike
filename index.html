@@ -36,14 +36,37 @@ function movetofoundation(e) {
 	var f = document.getElementById("foundation");
 	for (var i = 0; i < 4; i++) {
 		if (f.childNodes[i].childNodes.length == this.value && (this.value == 0 || this.suit == f.childNodes[i].lastChild.suit)) {
-			var from = this.parentNode;
-			if (this.previousSibling && this.previousSibling.faceup == false) {
-				this.previousSibling.flip();
-			}
-			from.removeChild(this);
-			f.childNodes[i].appendChild(this);
+			this.moveto(f.childNodes[i]);
 		}
 	}
+}
+
+function canmove(from, to) {
+	if (to.location == "foundation" && from.value == to.value + 1 && from.suit == to.suit) {
+		return true;
+	}
+	if (to.location == "tableau" && from.value == to.value - 1 && (from.suit - to.suit) % 2 != 0) {
+		return true;
+	}
+	return false;
+}
+
+function dragstart(e) {
+	e.dataTransfer.setData("Text", e.target.id);
+	window.dragging = e.target;
+}
+
+function drop(e) {
+	e.preventDefault();
+	var card = document.getElementById(e.dataTransfer.getData("Text"));
+	if (canmove(card, e.target)) {
+		card.moveto(e.target.parentNode);
+	}
+}
+
+function dragover(e) {
+	e.preventDefault();
+	e.returnValue = canmove(window.dragging, e.target);
 }
 
 var Card = function(suit, value) {
@@ -53,6 +76,15 @@ var Card = function(suit, value) {
 	c.value = value;
 	c.draggable = false;
 	c.faceup = true;
+	c.location = "deck";
+	c.moveto = function(to) {
+			var from = this.parentNode;
+			if (this.previousSibling && this.previousSibling.faceup == false) {
+				this.previousSibling.flip();
+			}
+			from.removeChild(this);
+			to.appendChild(this);
+	}
 	c.flip = function() {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
@@ -60,6 +92,9 @@ var Card = function(suit, value) {
 			this.innerHTML = values[this.value] + "<br>&" + suits[this.suit] +";";
 			this.draggable = true;
 			this.addEventListener("click", movetofoundation);
+			this.addEventListener("dragstart", dragstart);
+			this.addEventListener("drop", drop);
+			this.addEventListener("dragover", dragover);
 		} else {
 			this.className = "card facedown";
 			this.innerHTML = "";
@@ -102,6 +137,12 @@ function init() {
 	for (var s = 0; s < suits.length; s++) {
 		for (var v = 0; v < values.length; v++) {
 			cards.push(new Card(s, v));
+		}
+	}
+
+	for (var i = 0; i < 4; i++) {
+		for (var j = 0; j < 4; j++) {
+			console.log(suits[i] + "/" + suits[j] + "=" + ((i - j) % 2));
 		}
 	}
 
