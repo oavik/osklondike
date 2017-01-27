@@ -6,24 +6,28 @@
 body { background: darkgreen; }
 
 span { margin: 0; padding: 0; }
-div { padding: 0; }
-#upper { height: 240px; }
+div { padding: 0; display: inline-block; }
+br { clear: both; }
+#upper { height: 16em; }
 #upper div { display: inline-block; }
 
-#deck { width: 100px; height: 120px; }
+#deck { width: 6em; height: 8em; }
 #deck .card { position: absolute; top: 0; left: 0; }
 
-#waste { width: 200px; height: 120px; }
 #waste .card { position: absolute; top: 0; }
 
-#foundation { float: right; } 
-#foundation div { width: 100px; height: 120px; border: thin solid black; padding-left: 10px; }
-#foundation .card { position: relative; top: 0; }
+#foundation { position: fixed; right: 0; }
+#foundation > div { display: inline-block; width: 6em; height: 8em; border: thin solid black; margin-left: 1em; padding: 0; }
+#foundation .card { position: relative; top: 0; margin: 0; }
 
-#tableau { width: 770px; height: 120px; }
-#tableau div { width: 100px; display: inline-block; padding-left: 10px; vertical-align: top; }
+#tableau { position: fixed; margin-top: 7em; width: 100%; }
+#tableau > div { width: 13%; height: 8em; display: inline-block; margin-left: 1%; vertical-align: top; margin: thin solid black; }
 
-.card { background: white; width: 100px; height: 120px; display: inline-block; border: thin solid black; }
+.card { background: white; width: 6em; height: 8em; display: inline-block; border: thin solid black; }
+.card span { display: inline-block; height: 8em; padding: 0.1em; }
+.card .face { width: 4em; white-space: pre; text-align: center; vertical-align: middle; font-size: larger; }
+.card .top { float: left; vertical-align: top; }
+.card .bottom { float: right; vertical-align: top; visibility: hidden; }
 .facedown { background: blue; border: thin solid white;}
 .clubs, .spades { color: black; }
 .hearts, .diams { color: red; }
@@ -31,6 +35,19 @@ div { padding: 0; }
 <script type="text/javascript">
 var suits = [ "hearts", "clubs", "diams", "spades" ];
 var values = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];
+var faces = [
+	"x",
+	"x<br>x",
+	"x<br>x<br>x",
+	"x x<br>x x",
+	"x x<br> x <br>x x",
+	"x x<br>x x<br>x x",
+	"x x<br> x <br>x x<br>x x<br>x x",
+	"x x<br> x <br>x x<br> x <br>x x",
+	"x x<br>x x<br> x <br>x x<br>x x",
+	"x x<br> x <br>x x<br>x x<br> x <br>x x",
+	"J", "Q", "K"
+];
 
 function movetofoundation(e) {
 	var f = document.getElementById("foundation");
@@ -90,7 +107,9 @@ var Card = function(suit, value) {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
 			this.className = "card " + suits[this.suit];
-			this.innerHTML = values[this.value] + "<br>&" + suits[this.suit] +";";
+			this.innerHTML = '<span class="top">' + values[this.value] + "<br>&" + suits[this.suit] + ';</span><span class="face">' +
+				faces[this.value].replace(/x/g, "&" + suits[this.suit] + ";") + '<br></span><span class="bottom">' +
+				values[this.value] + "<br>&" + suits[this.suit] + ";</span>";
 			this.draggable = true;
 			this.addEventListener("click", movetofoundation);
 			this.addEventListener("dragstart", dragstart, false);
@@ -171,11 +190,12 @@ function init() {
 </script>
 </head>
 <body onload="init();">
-<div id="upper">
+<!-- div id="upper" -->
 	<div id="deck"></div>
 	<div id="waste"></div>
 	<div id="foundation"><div></div><div></div><div></div><div></div></div>
-</div>
+<br>
+<!-- /div -->
 <div id="tableau"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </body>
 </html>
