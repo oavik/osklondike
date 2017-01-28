@@ -12,8 +12,8 @@ div { padding: 0; display: inline-block; font-size: inherit; }
 
 #waste .card { position: fixed; top: 0.5em; }
 #waste :nth-last-child(3n+3) { left: 5.5em; z-index: -1; }
-#waste :nth-last-child(3n+2) { left: 7.5em; z-index: 0; }
-#waste :nth-last-child(3n+1) { left: 9.5em; z-index: 1; }
+#waste :nth-last-child(3n+2) { left: 6.5em; z-index: 0; }
+#waste :nth-last-child(3n+1) { left: 7.5em; z-index: 1; }
 
 #foundation { position: fixed; left: 14.5em; margin: 0; padding: 0; top: 0.5em; }
 #foundation > div { display: inline-block; width: 4em; height: 6em; padding: 0; border: thin solid black; margin-left: 1em; padding: 0; margin-right: 0; }
@@ -24,9 +24,12 @@ div { padding: 0; display: inline-block; font-size: inherit; }
 
 .card { background: white; width: 4em; height: 6em; border: thin solid black; position: fixed; padding: 0; }
 .card > span { display: inline-block; height: 6em; padding: 0.1em; top: inherit; left: inherit; margin: 0; }
-.card > .top { float: left; vertical-align: top; width: 0.9em; }
-.card > .face { width: 2em; white-space: pre; text-align: center; vertical-align: middle; line-height: 0.7em; }
-.card > .bottom { display: none; position: relative; float: right; vertical-align: top; top: 5em; }
+.card > .top, .card > .bottom { vertical-align: top; width: 4em; margin: 0; padding: 0; height: 1em; }
+.card > .top > .value { float: left; }
+.card > .top > .suit { float: right; }
+.card > .bottom > .value { float: right; }
+.card > .bottom > .suit { float: left; }
+.card > .face { width: 4em; height: 4em; white-space: pre; text-align: center; vertical-align: middle; line-height: 0.7em; margin: 0; padding: 0; margin-top: -0.5em; }
 .facedown { background: blue; border: thin solid white;}
 .clubs, .spades { color: black; }
 .hearts, .diams { color: red; }
@@ -35,17 +38,17 @@ div { padding: 0; display: inline-block; font-size: inherit; }
 var suits = [ "hearts", "clubs", "diams", "spades" ];
 var values = [ "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" ];
 var faces = [
-	"x",
-	"x<br>x",
-	"x<br>x<br>x",
-	"x x<br>x x",
-	"x x<br> x <br>x x",
-	"x x<br>x x<br>x x",
-	"x x<br> x <br>x x<br>x x<br>x x",
-	"x x<br> x <br>x x<br> x <br>x x",
-	"x x<br>x x<br> x <br>x x<br>x x",
-	"x x<br> x <br>x x<br>x x<br> x <br>x x",
-	"<!-- J -->xxx<br>xxx<br>xxx", "<!-- Q -->xxx<br>xxx<br>xxx", "<!-- K -->xxx<br>xxx<br>xxx"
+	"S",
+	"S<br>S",
+	"S<br>S<br>S",
+	"S S<br>S S",
+	"S S<br> S <br>S S",
+	"S S<br>S S<br>S S",
+	"S S<br> S <br>S S<br>S S<br>S S",
+	"S S<br> S <br>S S<br> S <br>S S",
+	"S S<br>S S<br> S <br>S S<br>S S",
+	"S S<br> S <br>S S<br>S S<br> S <br>S S",
+	"<!-- J -->SSS<br>SSS<br>SSS", "<!-- Q -->SSS<br>SSS<br>SSS", "<!-- K -->SSS<br>SSS<br>SSS"
 ];
 
 function movetofoundation(e) {
@@ -155,11 +158,14 @@ var Card = function(suit, value) {
 	c.flip = function() {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
+			var top = '<span class="top"><span class="value">V</span><span class="suit">S</span></span>';
+			var face = '<span class="face">' + faces[this.value] + '</span>';
+			var bot = '<span class="bottom"><span class="suit">S</span><span class="value">V</span></span>';
+			
 			this.className = "card " + suits[this.suit];
-			this.innerHTML = '<span class="top">' + values[this.value] /* + "<br>&" + suits[this.suit]*/ + '</span><span class="face">' +
-				faces[this.value].replace(/x/g, "&" + suits[this.suit] + ";") + '</span>';
-				/* <span class="bottom">' +
-				values[this.value] + "<br>&" + suits[this.suit] + ";</span>"; */
+			this.innerHTML = (top + face + bot)
+					.replace(/S/g, "&" + suits[this.suit] + ";")
+					.replace(/V/g, values[this.value].toString());
 			this.setmovable(true);
 		} else {
 			this.className = "card facedown";
