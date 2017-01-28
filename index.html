@@ -144,7 +144,7 @@ var Card = function(suit, value) {
 				this.style.top = document.getElementById("foundation").style.top;
 			} else {
 				if (this.previousSibling) {
-					this.style.top = (parseFloat(this.previousSibling.style.top) + 2.0) + "em";
+					this.style.top = (parseFloat(this.previousSibling.style.top) + 1.0) + "em";
 				} else {
 					this.style.top = document.getElementById("tableau").style.top;
 				}
