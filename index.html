@@ -6,7 +6,6 @@
 body { background: darkgreen; }
 
 div { padding: 0; display: inline-block; }
-br { clear: both; }
 #upper { height: 16em; }
 #upper div { display: inline-block; }
 
@@ -18,15 +17,16 @@ br { clear: both; }
 #waste :nth-last-child(3n+2) { left: 9.0em; z-index: 0; }
 #waste :nth-last-child(3n+1) { left: 10.5em; z-index: 1; }
 
-#foundation { position: fixed; right: 0; }
+#foundation { position: fixed; right: 0.5em; }
 #foundation > div { display: inline-block; width: 6em; height: 8em; border: thin solid black; margin-left: 1em; padding: 0; margin-top: 0; }
 #foundation .card { position: absolute; }
 
-#tableau { position: absolute; top: 16em; width: 100%; }
-#tableau > div { width: 13%; height: 8em; display: inline-block; margin-left: 1%; vertical-align: top; margin: thin solid black; }
-#tableau > div > .card { position: relative; margin-top: -7em; }
+#tableau { position: absolute; top: 9em; width: 100%; }
+#tableau > div { width: 13%; height: 8em; display: inline-block; vertical-align: top; text-align: center; border: thin solid red; }
+#tableau > div + div { margin-left: 1%; }
+#tableau > div > .card + .card { position: relative; margin-top: -7em; }
 
-.card { background: white; width: 6em; height: 8em; display: inline-block; border: thin solid black; }
+.card { background: white; width: 6em; height: 8em; border: thin solid black; }
 .card span { display: inline-block; height: 8em; padding: 0.1em; }
 .card .face { width: 4em; white-space: pre; text-align: center; vertical-align: middle; font-size: larger; }
 .card .top { float: left; vertical-align: top; }
@@ -78,8 +78,15 @@ function dragstart(e) {
 
 function drop(e) {
 	e.preventDefault();
+	console.log(e.target);
 	var card = document.getElementById(e.dataTransfer.getData("Text"));
 	var target = e.target;
+	if (target.className == "" && target.parentNode.id == "foundation") {
+		if (card.value == 0) {
+			card.moveto(target, "foundation");
+		}
+		return;
+	}
 	while (!target.className.includes("card")) {
 		target = target.parentNode;
 	}
@@ -215,12 +222,9 @@ function init() {
 </script>
 </head>
 <body onload="init();">
-<!-- div id="upper" -->
-	<div id="deck"></div>
-	<div id="waste"></div>
-	<div id="foundation"><div></div><div></div><div></div><div></div></div>
-<br>
-<!-- /div -->
+<div id="deck"></div>
+<div id="waste"></div>
+<div id="foundation"><div></div><div></div><div></div><div></div></div>
 <div id="tableau"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 </body>
 </html>
