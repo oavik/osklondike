@@ -5,9 +5,7 @@
 <style type="text/css">
 body { background: darkgreen; }
 
-div { padding: 0; display: inline-block; }
-#upper { height: 16em; }
-#upper div { display: inline-block; }
+div { padding: 0; display: inline-block; font-size: inherit; }
 
 #deck { width: 6em; height: 8em; position: fixed; top: 0.5em; left: .5em; }
 #deck .card { position: inherit; }
@@ -27,10 +25,10 @@ div { padding: 0; display: inline-block; }
 #tableau > div > .card + .card { position: relative; margin-top: -7em; }
 
 .card { background: white; width: 6em; height: 8em; border: thin solid black; }
-.card span { display: inline-block; height: 8em; padding: 0.1em; }
-.card .face { width: 4em; white-space: pre; text-align: center; vertical-align: middle; font-size: larger; }
-.card .top { float: left; vertical-align: top; }
-.card .bottom { float: right; vertical-align: top; visibility: hidden; }
+.card > span { display: inline-block; height: 8em; padding: 0.1em; }
+.card > .face { width: 4em; white-space: pre; text-align: center; vertical-align: middle; font-size: larger; visibility: hidden; }
+.card > .top { float: left; vertical-align: top; }
+.card > .bottom { float: right; vertical-align: top; visibility: hidden; }
 .facedown { background: blue; border: thin solid white;}
 .clubs, .spades { color: black; }
 .hearts, .diams { color: red; }
@@ -137,8 +135,11 @@ var Card = function(suit, value) {
 			from.removeChild(this);
 			to.appendChild(this);
 			this.location = loc;
-			if (next != undefined) {
-				next.moveto(this.parentNode, loc);
+			while (next != undefined) {
+				var nnext = next.nextSibling;
+				from.removeChild(next);
+				to.appendChild(next);
+				next = nnext;
 			}
 	};
 	c.flip = function() {
@@ -189,6 +190,13 @@ function draw(e) {
 	waste.lastChild.setmovable(true);
 }
 
+function resize() {
+	var width = Math.floor(window.innerWidth / 49);
+	var height = Math.floor(window.innerHeight / 30);
+	document.getElementsByTagName("body")[0].style.fontSize = Math.min(width, height) + "px";
+	console.log("font size " + Math.min(width, height));
+}
+
 function init() {
 	var cards = new Array();
 	for (var s = 0; s < suits.length; s++) {
@@ -227,7 +235,7 @@ function init() {
 
 </script>
 </head>
-<body onload="init();">
+<body onload="resize(); init();" onresize="resize();">
 <div id="deck"></div>
 <div id="waste"></div>
 <div id="foundation"><div></div><div></div><div></div><div></div></div>
