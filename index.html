@@ -78,7 +78,6 @@ function dragstart(e) {
 
 function drop(e) {
 	e.preventDefault();
-	console.log(e.target);
 	var card = document.getElementById(e.dataTransfer.getData("Text"));
 	var target = e.target;
 	if (target.className == "" && target.parentNode.id == "foundation") {
@@ -87,7 +86,6 @@ function drop(e) {
 		}
 		return;
 	} else if (target.className == "" && target.parentNode.id == "tableau") {
-		console.log(card.value);
 		if (card.value == values.length - 1) {
 			card.moveto(target, "tableau");
 		}
