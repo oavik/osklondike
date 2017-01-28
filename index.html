@@ -7,26 +7,26 @@ body { background: darkgreen; }
 
 div { padding: 0; display: inline-block; font-size: inherit; }
 
-#deck { width: 6em; height: 8em; position: fixed; top: 0.5em; left: .5em; }
+#deck { width: 4em; height: 6em; position: fixed; top: 0.5em; left: .5em; }
 #deck .card { position: inherit; }
 
 #waste .card { position: fixed; top: 0.5em; }
-#waste :nth-last-child(3n+3) { left: 7.5em; z-index: -1; }
-#waste :nth-last-child(3n+2) { left: 9.0em; z-index: 0; }
-#waste :nth-last-child(3n+1) { left: 10.5em; z-index: 1; }
+#waste :nth-last-child(3n+3) { left: 5.5em; z-index: -1; }
+#waste :nth-last-child(3n+2) { left: 7.5em; z-index: 0; }
+#waste :nth-last-child(3n+1) { left: 9.5em; z-index: 1; }
 
-#foundation { position: fixed; left: 20.5em; margin: 0; padding: 0; top: 0.5em; }
-#foundation > div { display: inline-block; width: 6em; height: 8em; padding: 0; border: thin solid black; margin-left: 1em; padding: 0; margin-right: 0; }
+#foundation { position: fixed; left: 14.5em; margin: 0; padding: 0; top: 0.5em; }
+#foundation > div { display: inline-block; width: 4em; height: 6em; padding: 0; border: thin solid black; margin-left: 1em; padding: 0; margin-right: 0; }
 
 #tableau { position: fixed; top: 9em; margin: 0; padding: 0; }
-#tableau > div { width: 6em; height: 8em; display: inline-block; } 
+#tableau > div { width: 4em; height: 6em; display: inline-block; } 
 #tableau > div + div { margin-left: 1em; }
 
-.card { background: white; width: 6em; height: 8em; border: thin solid black; position: fixed; }
-.card > span { display: inline-block; height: 8em; padding: 0.1em; top: inherit; left: inherit; }
-.card > .top { float: left; vertical-align: top; }
-.card > .face { width: 4em; white-space: pre; text-align: center; vertical-align: middle; }
-.card > .bottom { position: relative; float: right; vertical-align: top; top: 5em; visibility: hidden;}
+.card { background: white; width: 4em; height: 6em; border: thin solid black; position: fixed; padding: 0; }
+.card > span { display: inline-block; height: 6em; padding: 0.1em; top: inherit; left: inherit; margin: 0; }
+.card > .top { float: left; vertical-align: top; width: 0.9em; }
+.card > .face { width: 2em; white-space: pre; text-align: center; vertical-align: middle; line-height: 0.7em; }
+.card > .bottom { display: none; position: relative; float: right; vertical-align: top; top: 5em; }
 .facedown { background: blue; border: thin solid white;}
 .clubs, .spades { color: black; }
 .hearts, .diams { color: red; }
@@ -45,7 +45,7 @@ var faces = [
 	"x x<br> x <br>x x<br> x <br>x x",
 	"x x<br>x x<br> x <br>x x<br>x x",
 	"x x<br> x <br>x x<br>x x<br> x <br>x x",
-	"<!-- J -->", "<!-- Q -->", "<!-- K -->"
+	"<!-- J -->xxx<br>xxx<br>xxx", "<!-- Q -->xxx<br>xxx<br>xxx", "<!-- K -->xxx<br>xxx<br>xxx"
 ];
 
 function movetofoundation(e) {
@@ -156,9 +156,10 @@ var Card = function(suit, value) {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
 			this.className = "card " + suits[this.suit];
-			this.innerHTML = '<span class="top">' + values[this.value] + "<br>&" + suits[this.suit] + ';</span><span class="face">' +
-				faces[this.value].replace(/x/g, "&" + suits[this.suit] + ";") + '<br></span><span class="bottom">' +
-				values[this.value] + "<br>&" + suits[this.suit] + ";</span>";
+			this.innerHTML = '<span class="top">' + values[this.value] /* + "<br>&" + suits[this.suit]*/ + '</span><span class="face">' +
+				faces[this.value].replace(/x/g, "&" + suits[this.suit] + ";") + '</span>';
+				/* <span class="bottom">' +
+				values[this.value] + "<br>&" + suits[this.suit] + ";</span>"; */
 			this.setmovable(true);
 		} else {
 			this.className = "card facedown";
@@ -202,8 +203,8 @@ function draw(e) {
 }
 
 function resize() {
-	var width = Math.floor(window.innerWidth / 49);
-	var height = Math.floor(window.innerHeight / 30);
+	var width = Math.floor(window.innerWidth / 35);
+	var height = Math.floor(window.innerHeight / 20);
 	document.getElementsByTagName("body")[0].style.fontSize = Math.min(width, height) + "px";
 }
 
@@ -227,13 +228,13 @@ function init() {
 	for (var t = 0; t < 7; t++) {
 		tableau.childNodes[t].addEventListener("dragover", dragover);
 		tableau.childNodes[t].addEventListener("drop", drop);
-		tableau.childNodes[t].style.left = ((7 * t) + 0.5) + "em";
+		tableau.childNodes[t].style.left = ((5 * t) + 0.5) + "em";
 		for (var c = 6 - t; c < 7; c++) {
 			var card = deck.lastChild;
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
 			card.location = "tableau";
-			card.style.top = ((12 + t + c)/2) + "em";
+			card.style.top = ((10 + t + c)/2) + "em";
 			card.style.left = tableau.childNodes[t].style.left;
 		}
 		tableau.childNodes[t].lastChild.flip();
