@@ -62,7 +62,7 @@ function movetofoundation(e) {
 }
 
 function canmove(from, to) {
-	if (to.location == "foundation" && (from.value == 0) || (from.value == to.value + 1 && from.suit == to.suit)) {
+	if ((to.location == "foundation" && from.nextSibling == undefined) && (from.value == 0) || (from.value == to.value + 1 && from.suit == to.suit)) {
 		return true;
 	}
 	if (to.location == "tableau" && from.value == to.value - 1 && (from.suit - to.suit) % 2 != 0) {
@@ -117,6 +117,7 @@ var Card = function(suit, value) {
 	};
 	c.moveto = function(to, loc) {
 			var from = this.parentNode;
+			var next = this.nextSibling;
 			if (this.previousSibling && this.previousSibling.faceup == false) {
 				this.previousSibling.flip();
 			} else if (this.previousSibling && this.previousSibling.faceup == true) {
@@ -125,6 +126,9 @@ var Card = function(suit, value) {
 			from.removeChild(this);
 			to.appendChild(this);
 			this.location = loc;
+			if (next != undefined) {
+				next.moveto(this.parentNode, loc);
+			}
 	};
 	c.flip = function() {
 		this.faceup = !this.faceup;
@@ -168,7 +172,6 @@ function draw(e) {
 			c.flip();
 			c.setmovable(false);
 			waste.appendChild(c);
-			console.log("Drew " + values[c.value] + " of " + suits[c.suit]);
 		}
 	}
 
