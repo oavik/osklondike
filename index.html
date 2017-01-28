@@ -15,12 +15,11 @@ div { padding: 0; display: inline-block; font-size: inherit; }
 #waste :nth-last-child(3n+2) { left: 6.5em; z-index: 0; }
 #waste :nth-last-child(3n+1) { left: 7.5em; z-index: 1; }
 
-#foundation { position: fixed; left: 14.5em; margin: 0; padding: 0; top: 0.5em; }
-#foundation > div { display: inline-block; width: 4em; height: 6em; padding: 0; border: thin solid black; margin-left: 1em; padding: 0; margin-right: 0; }
+#foundation { position: fixed; left: 14em; margin: 0; padding: 0; top: 0.5em; }
+#foundation > div { display: inline-block; width: 4em; height: 6em; padding: 0; border: thin solid black; margin-right: 0.5em; margin-left: 0; }
 
 #tableau { position: fixed; top: 9em; margin: 0; padding: 0; }
 #tableau > div { width: 4em; height: 6em; display: inline-block; } 
-#tableau > div + div { margin-left: 1em; }
 
 .card { background: white; width: 4em; height: 6em; border: thin solid black; position: fixed; padding: 0; }
 .card > span { display: inline-block; height: 6em; padding: 0.1em; top: inherit; left: inherit; margin: 0; }
@@ -234,13 +233,13 @@ function init() {
 	for (var t = 0; t < 7; t++) {
 		tableau.childNodes[t].addEventListener("dragover", dragover);
 		tableau.childNodes[t].addEventListener("drop", drop);
-		tableau.childNodes[t].style.left = ((5 * t) + 0.5) + "em";
+		tableau.childNodes[t].style.left = ((1 + (t * 9)) / 2.0) + "em";
 		for (var c = 6 - t; c < 7; c++) {
 			var card = deck.lastChild;
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
 			card.location = "tableau";
-			card.style.top = ((10 + t + c)/2) + "em";
+			card.style.top = ((10 + t + c)/2.0) + "em";
 			card.style.left = tableau.childNodes[t].style.left;
 		}
 		tableau.childNodes[t].lastChild.flip();
