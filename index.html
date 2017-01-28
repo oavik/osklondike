@@ -22,7 +22,7 @@ div { padding: 0; display: inline-block; }
 #foundation .card { position: absolute; }
 
 #tableau { position: absolute; top: 9em; width: 100%; }
-#tableau > div { width: 13%; height: 8em; display: inline-block; vertical-align: top; text-align: center; border: thin solid red; }
+#tableau > div { width: 13%; height: 8em; display: inline-block; vertical-align: top; text-align: center; }
 #tableau > div + div { margin-left: 1%; }
 #tableau > div > .card + .card { position: relative; margin-top: -7em; }
 
@@ -54,7 +54,7 @@ var faces = [
 
 function movetofoundation(e) {
 	var f = document.getElementById("foundation");
-	for (var i = 0; i < 4; i++) {
+	for (var i = 3; i >= 0; i--) {
 		if (f.childNodes[i].childNodes.length == this.value && (this.value == 0 || this.suit == f.childNodes[i].lastChild.suit)) {
 			this.moveto(f.childNodes[i], "foundation");
 		}
@@ -84,6 +84,12 @@ function drop(e) {
 	if (target.className == "" && target.parentNode.id == "foundation") {
 		if (card.value == 0) {
 			card.moveto(target, "foundation");
+		}
+		return;
+	} else if (target.className == "" && target.parentNode.id == "tableau") {
+		console.log(card.value);
+		if (card.value == values.length - 1) {
+			card.moveto(target, "tableau");
 		}
 		return;
 	}
@@ -203,6 +209,8 @@ function init() {
 
 	var tableau = document.getElementById("tableau");
 	for (var t = 0; t < 7; t++) {
+		tableau.childNodes[t].addEventListener("dragover", dragover);
+		tableau.childNodes[t].addEventListener("drop", drop);
 		for (var c = 6 - t; c < 7; c++) {
 			var card = deck.lastChild;
 			deck.removeChild(card);
