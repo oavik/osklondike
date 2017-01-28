@@ -5,23 +5,26 @@
 <style type="text/css">
 body { background: darkgreen; }
 
-span { margin: 0; padding: 0; }
 div { padding: 0; display: inline-block; }
 br { clear: both; }
 #upper { height: 16em; }
 #upper div { display: inline-block; }
 
-#deck { width: 6em; height: 8em; }
-#deck .card { position: absolute; top: 0; left: 0; }
+#deck { width: 6em; height: 8em; position: fixed; top: 0.5em; left: .5em; }
+#deck .card { position: inherit; }
 
-#waste .card { position: absolute; top: 0; }
+#waste .card { position: fixed; top: 0.5em; }
+#waste :nth-child(3n+0) { left: 7.5em; z-index: -1; }
+#waste :nth-child(3n+1) { left: 9.0em; z-index: 0; }
+#waste :nth-child(3n+2) { left: 10.5em; z-index: 1;}
 
 #foundation { position: fixed; right: 0; }
-#foundation > div { display: inline-block; width: 6em; height: 8em; border: thin solid black; margin-left: 1em; padding: 0; }
-#foundation .card { position: relative; top: 0; margin: 0; }
+#foundation > div { display: inline-block; width: 6em; height: 8em; border: thin solid black; margin-left: 1em; padding: 0; margin-top: 0; }
+#foundation .card { position: absolute; }
 
-#tableau { position: fixed; margin-top: 7em; width: 100%; }
+#tableau { position: absolute; top: 14em; width: 100%; }
 #tableau > div { width: 13%; height: 8em; display: inline-block; margin-left: 1%; vertical-align: top; margin: thin solid black; }
+#tableau > div > .card { position: relative; margin-top: -7em; }
 
 .card { background: white; width: 6em; height: 8em; display: inline-block; border: thin solid black; }
 .card span { display: inline-block; height: 8em; padding: 0.1em; }
@@ -46,7 +49,7 @@ var faces = [
 	"x x<br> x <br>x x<br> x <br>x x",
 	"x x<br>x x<br> x <br>x x<br>x x",
 	"x x<br> x <br>x x<br>x x<br> x <br>x x",
-	"J", "Q", "K"
+	"<!-- J -->", "<!-- Q -->", "<!-- K -->"
 ];
 
 function movetofoundation(e) {
@@ -76,13 +79,16 @@ function dragstart(e) {
 function drop(e) {
 	e.preventDefault();
 	var card = document.getElementById(e.dataTransfer.getData("Text"));
-	if (canmove(card, e.target)) {
-		card.moveto(e.target.parentNode, e.target.location);
+	var target = e.target;
+	while (!target.className.includes("card")) {
+		target = target.parentNode;
+	}
+	if (canmove(card, target)) {
+		card.moveto(target.parentNode, target.location);
 	}
 }
 
 function dragover(e) {
-	console.log(e);
 	e.preventDefault();
 }
 
@@ -136,7 +142,6 @@ function draw(e) {
 			var c = waste.lastChild;
 			waste.removeChild(c);
 			c.flip();
-			c.style.marginLeft = 0;
 			deck.appendChild(c);
 		}
 	}
@@ -146,8 +151,8 @@ function draw(e) {
 			var c = deck.lastChild;
 			deck.removeChild(c);
 			c.flip();
-			c.style.marginLeft = i * 1 + "em";
 			waste.appendChild(c);
+			console.log("Drew " + values[c.value] + " of " + suits[c.suit]);
 		}
 	}
 }
@@ -172,10 +177,9 @@ function init() {
 	for (var t = 0; t < 7; t++) {
 		for (var c = 6 - t; c < 7; c++) {
 			var card = deck.lastChild;
-			card.location = "deck";
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
-			card.style.marginTop = "-100px";
+			card.location = "tableau";
 		}
 		tableau.childNodes[t].lastChild.flip();
 	}
