@@ -58,7 +58,7 @@ function movetofoundation(e) {
 }
 
 function canmove(from, to) {
-	if ((to.location == "foundation" && from.nextSibling == undefined) && ((from.value == 0) || (from.value == to.value + 1 && from.suit == to.suit))) {
+	if ((to.location == "foundation" && from.nextSibling == undefined) && (from.value == 0 || (from.value == to.value + 1 && from.suit == to.suit))) {
 		return true;
 	}
 	if (to.location == "tableau" && from.value == to.value - 1 && (from.suit - to.suit) % 2 != 0) {
@@ -137,7 +137,7 @@ var Card = function(suit, value) {
 				this.style.top = "0.5em";
 			} else {
 				if (this.previousSibling) {
-					this.style.top = (parseInt(this.previousSibling.style.top) + 1) + "em";
+					this.style.top = (parseFloat(this.previousSibling.style.top) + 2) + "em";
 				} else {
 					this.style.top = "9em";
 				}
@@ -230,7 +230,7 @@ function init() {
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
 			card.location = "tableau";
-			card.style.top = (3 +t + c) + "em";
+			card.style.top = ((12 + t + c)/2) + "em";
 		}
 		tableau.childNodes[t].lastChild.flip();
 	}
