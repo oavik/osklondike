@@ -18,10 +18,10 @@ div { padding: 0; display: inline-block; font-size: inherit; }
 #foundation { position: fixed; left: 14em; margin: 0; padding: 0; top: 0.5em; }
 #foundation > div { display: inline-block; width: 4em; height: 6em; padding: 0; border: thin solid black; margin-right: 0.5em; margin-left: 0; }
 
-#tableau { position: fixed; top: 9em; margin: 0; padding: 0; }
+#tableau { position: fixed; top: 7em; margin: 0; padding: 0; }
 #tableau > div { width: 4em; height: 6em; display: inline-block; } 
 
-.card { background: white; width: 4em; height: 6em; border: thin solid black; position: fixed; padding: 0; }
+.card { display: block ;background: white; width: 4em; height: 6em; border: thin solid black; position: fixed; padding: 0; }
 .card > span { display: inline-block; height: 6em; padding: 0.1em; top: inherit; left: inherit; margin: 0; }
 .card > .top, .card > .bottom { vertical-align: top; width: 4em; margin: 0; padding: 0; height: 1em; }
 .card > .top > .value { float: left; }
@@ -47,7 +47,7 @@ var faces = [
 	"S S<br> S <br>S S<br> S <br>S S",
 	"S S<br>S S<br> S <br>S S<br>S S",
 	"S S<br> S <br>S S<br>S S<br> S <br>S S",
-	"<!-- J -->SSS<br>SSS<br>SSS", "<!-- Q -->SSS<br>SSS<br>SSS", "<!-- K -->SSS<br>SSS<br>SSS"
+	"SSS<br>SSS<br>SSS", "SSS<br>SSS<br>SSS", "SSS<br>SSS<br>SSS"
 ];
 
 function movetofoundation(e) {
@@ -55,6 +55,23 @@ function movetofoundation(e) {
 	for (var i = 3; i >= 0; i--) {
 		if (f.childNodes[i].childNodes.length == this.value && (this.value == 0 || this.suit == f.childNodes[i].lastChild.suit)) {
 			this.moveto(f.childNodes[i], "foundation");
+		}
+	}
+}
+
+function resizetableau() {
+	var tab = document.getElementById("tableau");
+	var top = 7.0; //parseFloat(tab.style.top);
+	for (var t = 0; t < 7; t++) {
+		var facedown = 0;
+		var faceup = 0;
+		for (var i = 0; i < tab.childNodes[t].childNodes.length; i++) {
+			tab.childNodes[t].childNodes[i].style.top = (top + (facedown * .25) + (faceup * 1.0)) + "em";
+			if (tab.childNodes[t].childNodes[i].faceup) {
+				faceup++;
+			} else {
+				facedown++;
+			}
 		}
 	}
 }
@@ -143,11 +160,7 @@ var Card = function(suit, value) {
 			if (loc == "foundation") {
 				this.style.top = document.getElementById("foundation").style.top;
 			} else {
-				if (this.previousSibling) {
-					this.style.top = (parseFloat(this.previousSibling.style.top) + 1.0) + "em";
-				} else {
-					this.style.top = document.getElementById("tableau").style.top;
-				}
+				resizetableau();
 			}
 
 			if (next) {
@@ -158,7 +171,7 @@ var Card = function(suit, value) {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
 			var top = '<span class="top"><span class="value">V</span><span class="suit">S</span></span>';
-			var face = '<span class="face">' + faces[this.value] + '</span>';
+			var face = '<span class="face"><!-- ' + faces[this.value] + ' --></span>';
 			var bot = '<span class="bottom"><span class="suit">S</span><span class="value">V</span></span>';
 			
 			this.className = "card " + suits[this.suit];
@@ -239,11 +252,11 @@ function init() {
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
 			card.location = "tableau";
-			card.style.top = ((10 + t + c)/2.0) + "em";
 			card.style.left = tableau.childNodes[t].style.left;
 		}
 		tableau.childNodes[t].lastChild.flip();
 	}
+	resizetableau();
 
 	var foundation = document.getElementById("foundation");
 	for (var f = 0; f < 4; f++) {
