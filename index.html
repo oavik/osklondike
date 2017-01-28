@@ -17,17 +17,15 @@ div { padding: 0; display: inline-block; font-size: inherit; }
 
 #foundation { position: fixed; right: 0.5em; }
 #foundation > div { display: inline-block; width: 6em; height: 8em; border: thin solid black; margin-left: 1em; padding: 0; margin-top: 0; }
-#foundation .card { position: absolute; }
 
-#tableau { position: absolute; top: 9em; width: 100%; }
+#tableau { position: fixed; top: 9em; width: 100%; }
 #tableau > div { width: 13%; height: 8em; display: inline-block; vertical-align: top; text-align: center; }
 #tableau > div + div { margin-left: 1%; }
-#tableau > div > .card + .card { position: relative; margin-top: -7em; }
 
-.card { background: white; width: 6em; height: 8em; border: thin solid black; }
+.card { background: white; width: 6em; height: 8em; border: thin solid black; position: fixed; }
 .card > span { display: inline-block; height: 8em; padding: 0.1em; }
-.card > .face { width: 4em; white-space: pre; text-align: center; vertical-align: middle; font-size: larger; visibility: hidden; }
 .card > .top { float: left; vertical-align: top; }
+.card > .face { width: 4em; white-space: pre; text-align: center; vertical-align: middle; font-size: larger; visibility: hidden; }
 .card > .bottom { float: right; vertical-align: top; visibility: hidden; }
 .facedown { background: blue; border: thin solid white;}
 .clubs, .spades { color: black; }
@@ -60,7 +58,7 @@ function movetofoundation(e) {
 }
 
 function canmove(from, to) {
-	if ((to.location == "foundation" && from.nextSibling == undefined) && (from.value == 0) || (from.value == to.value + 1 && from.suit == to.suit)) {
+	if ((to.location == "foundation" && from.nextSibling == undefined) && ((from.value == 0) || (from.value == to.value + 1 && from.suit == to.suit))) {
 		return true;
 	}
 	if (to.location == "tableau" && from.value == to.value - 1 && (from.suit - to.suit) % 2 != 0) {
@@ -135,7 +133,17 @@ var Card = function(suit, value) {
 			from.removeChild(this);
 			to.appendChild(this);
 			this.location = loc;
+			if (loc == "foundation") {
+				this.style.top = "0.5em";
+			} else {
+				if (this.previousSibling) {
+					this.style.top = (parseInt(this.previousSibling.style.top) + 1) + "em";
+				} else {
+					this.style.top = "9em";
+				}
+			}
 			while (next != undefined) {
+				console.log(next);
 				var nnext = next.nextSibling;
 				from.removeChild(next);
 				to.appendChild(next);
@@ -222,6 +230,7 @@ function init() {
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
 			card.location = "tableau";
+			card.style.top = (3 +t + c) + "em";
 		}
 		tableau.childNodes[t].lastChild.flip();
 	}
