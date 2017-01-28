@@ -15,12 +15,12 @@ div { padding: 0; display: inline-block; font-size: inherit; }
 #waste :nth-last-child(3n+2) { left: 9.0em; z-index: 0; }
 #waste :nth-last-child(3n+1) { left: 10.5em; z-index: 1; }
 
-#foundation { position: fixed; right: 0.5em; }
+#foundation { position: fixed; left: 20em; }
 #foundation > div { display: inline-block; width: 6em; height: 8em; border: thin solid black; margin-left: 1em; padding: 0; margin-top: 0; }
 
-#tableau { position: fixed; top: 9em; width: 100%; }
-#tableau > div { width: 13%; height: 8em; display: inline-block; vertical-align: top; text-align: center; }
-#tableau > div + div { margin-left: 1%; }
+#tableau { position: fixed; top: 9em; }
+#tableau > div { width: 6em; height: 8em; display: inline-block; } 
+#tableau > div + div { margin-left: 1em; }
 
 .card { background: white; width: 6em; height: 8em; border: thin solid black; position: fixed; }
 .card > span { display: inline-block; height: 8em; padding: 0.1em; }
@@ -125,29 +125,30 @@ var Card = function(suit, value) {
 	c.moveto = function(to, loc) {
 			var from = this.parentNode;
 			var next = this.nextSibling;
+
 			if (this.previousSibling && this.previousSibling.faceup == false) {
 				this.previousSibling.flip();
 			} else if (this.previousSibling && this.previousSibling.faceup == true) {
 				this.previousSibling.setmovable(true);
 			}
+
 			from.removeChild(this);
 			to.appendChild(this);
+
 			this.location = loc;
+			this.style.left = to.style.left;
 			if (loc == "foundation") {
-				this.style.top = "0.5em";
+				this.style.top = document.getElementById("foundation").style.top;
 			} else {
 				if (this.previousSibling) {
-					this.style.top = (parseFloat(this.previousSibling.style.top) + 2) + "em";
+					this.style.top = (parseFloat(this.previousSibling.style.top) + 2.0) + "em";
 				} else {
-					this.style.top = "9em";
+					this.style.top = document.getElementById("tableau").style.top;
 				}
 			}
-			while (next != undefined) {
-				console.log(next);
-				var nnext = next.nextSibling;
-				from.removeChild(next);
-				to.appendChild(next);
-				next = nnext;
+
+			if (next) {
+				next.moveto(this, loc);
 			}
 	};
 	c.flip = function() {
@@ -183,6 +184,7 @@ function draw(e) {
 			c.flip();
 			deck.appendChild(c);
 		}
+		return;
 	}
 
 	for (var i = 0; i < 3; i++) {
@@ -225,6 +227,7 @@ function init() {
 	for (var t = 0; t < 7; t++) {
 		tableau.childNodes[t].addEventListener("dragover", dragover);
 		tableau.childNodes[t].addEventListener("drop", drop);
+		tableau.childNodes[t].style.left = ((7 * t) + 0.5) + "em";
 		for (var c = 6 - t; c < 7; c++) {
 			var card = deck.lastChild;
 			deck.removeChild(card);
