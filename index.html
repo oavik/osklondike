@@ -14,15 +14,15 @@ br { clear: both; }
 #deck .card { position: inherit; }
 
 #waste .card { position: fixed; top: 0.5em; }
-#waste :nth-child(3n+0) { left: 7.5em; z-index: -1; }
-#waste :nth-child(3n+1) { left: 9.0em; z-index: 0; }
-#waste :nth-child(3n+2) { left: 10.5em; z-index: 1;}
+#waste :nth-last-child(3n+3) { left: 7.5em; z-index: -1; }
+#waste :nth-last-child(3n+2) { left: 9.0em; z-index: 0; }
+#waste :nth-last-child(3n+1) { left: 10.5em; z-index: 1; }
 
 #foundation { position: fixed; right: 0; }
 #foundation > div { display: inline-block; width: 6em; height: 8em; border: thin solid black; margin-left: 1em; padding: 0; margin-top: 0; }
 #foundation .card { position: absolute; }
 
-#tableau { position: absolute; top: 14em; width: 100%; }
+#tableau { position: absolute; top: 16em; width: 100%; }
 #tableau > div { width: 13%; height: 8em; display: inline-block; margin-left: 1%; vertical-align: top; margin: thin solid black; }
 #tableau > div > .card { position: relative; margin-top: -7em; }
 
@@ -100,15 +100,32 @@ var Card = function(suit, value) {
 	c.draggable = false;
 	c.faceup = true;
 	c.location = "deck";
+	c.setmovable = function(movable) {
+		if (movable) {
+			this.draggable = true;
+			this.addEventListener("click", movetofoundation);
+			this.addEventListener("dragstart", dragstart, false);
+			this.addEventListener("drop", drop, false);
+			this.addEventListener("dragover", dragover, false);
+		} else {
+			this.draggable = false;
+			this.removeEventListener("click", movetofoundation);
+			this.removeEventListener("dragstart", dragstart, false);
+			this.removeEventListener("drop", drop, false);
+			this.removeEventListener("dragover", dragover, false);
+		}
+	};
 	c.moveto = function(to, loc) {
 			var from = this.parentNode;
 			if (this.previousSibling && this.previousSibling.faceup == false) {
 				this.previousSibling.flip();
+			} else if (this.previousSibling && this.previousSibling.faceup == true) {
+				this.previousSibling.setmovable(true);
 			}
 			from.removeChild(this);
 			to.appendChild(this);
 			this.location = loc;
-	}
+	};
 	c.flip = function() {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
@@ -116,16 +133,11 @@ var Card = function(suit, value) {
 			this.innerHTML = '<span class="top">' + values[this.value] + "<br>&" + suits[this.suit] + ';</span><span class="face">' +
 				faces[this.value].replace(/x/g, "&" + suits[this.suit] + ";") + '<br></span><span class="bottom">' +
 				values[this.value] + "<br>&" + suits[this.suit] + ";</span>";
-			this.draggable = true;
-			this.addEventListener("click", movetofoundation);
-			this.addEventListener("dragstart", dragstart, false);
-			this.addEventListener("drop", drop, false);
-			this.addEventListener("dragover", dragover, false);
+			this.setmovable(true);
 		} else {
 			this.className = "card facedown";
 			this.innerHTML = "";
-			this.draggable = false;
-			this.removeEventListener("click", movetofoundation);
+			this.setmovable(false);
 		}
 	};
 	c.flip();
@@ -136,6 +148,9 @@ function draw(e) {
 	e.preventDefault();
 	var deck = document.getElementById("deck");
 	var waste = document.getElementById("waste");
+	if (waste.childNodes.length > 0) {
+		waste.lastChild.setmovable(false);
+	}
 
 	if (deck.childNodes.length == 0) {
 		while (waste.childNodes.length > 0) {
@@ -151,10 +166,13 @@ function draw(e) {
 			var c = deck.lastChild;
 			deck.removeChild(c);
 			c.flip();
+			c.setmovable(false);
 			waste.appendChild(c);
 			console.log("Drew " + values[c.value] + " of " + suits[c.suit]);
 		}
 	}
+
+	waste.lastChild.setmovable(true);
 }
 
 function init() {
