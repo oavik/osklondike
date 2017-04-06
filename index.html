@@ -76,16 +76,6 @@ function resizetableau() {
 	}
 }
 
-function canmove(from, to) {
-	if ((to.location == "foundation" && from.nextSibling == undefined) && (from.value == 0 || (from.value == to.value + 1 && from.suit == to.suit))) {
-		return true;
-	}
-	if (to.location == "tableau" && from.value == to.value - 1 && (from.suit - to.suit) % 2 != 0) {
-		return true;
-	}
-	return false;
-}
-
 function dragstart(e) {
 	e.dataTransfer.setData("Text", e.target.id);
 	window.dragging = e.target;
@@ -95,22 +85,24 @@ function drop(e) {
 	e.preventDefault();
 	var card = document.getElementById(e.dataTransfer.getData("Text"));
 	var target = e.target;
-	if (target.className == "" && target.parentNode.id == "foundation") {
-		if (card.value == 0) {
-			card.moveto(target, "foundation");
+	while (target.parentNode.id != "foundation" && target.parentNode.id != "tableau") {
+		target = target.parentNode;
+	}
+
+	if (target.parentNode.id == "foundation") {
+		if (card.value == target.childNodes.length) {
+			if (card.value == 0 || (card.suit == target.lastChild.suit)) {
+				card.moveto(target, "foundation");
+			}
 		}
 		return;
-	} else if (target.className == "" && target.parentNode.id == "tableau") {
-		if (card.value == values.length - 1) {
+	} else if (target.parentNode.id == "tableau") {
+		if (target.childNodes.length == 0 && card.value == values.length - 1) {
+			card.moveto(target, "tableau");
+		} else if (target.lastChild.value == card.value + 1 && (target.lastChild.suit - card.suit) % 2 != 0) {
 			card.moveto(target, "tableau");
 		}
 		return;
-	}
-	while (!target.className.includes("card")) {
-		target = target.parentNode;
-	}
-	if (canmove(card, target)) {
-		card.moveto(target.parentNode, target.location);
 	}
 }
 
@@ -131,14 +123,10 @@ var Card = function(suit, value) {
 			this.draggable = true;
 			this.addEventListener("click", movetofoundation);
 			this.addEventListener("dragstart", dragstart, false);
-			this.addEventListener("drop", drop, false);
-			this.addEventListener("dragover", dragover, false);
 		} else {
 			this.draggable = false;
 			this.removeEventListener("click", movetofoundation);
 			this.removeEventListener("dragstart", dragstart, false);
-			this.removeEventListener("drop", drop, false);
-			this.removeEventListener("dragover", dragover, false);
 		}
 	};
 	c.moveto = function(to, loc) {
