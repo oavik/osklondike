@@ -32,15 +32,12 @@ body { background: darkgreen; }
 
 div { padding: 0; display: inline-block; font-size: inherit; }
 
-#options {
-	position: fixed;
-	width: 50%;
-	height: 25%;
-	margin-left: auto;
-	margin-right: auto;
-}
+#options { padding: 1em; }
+
+button { width: 100%; display: block; margin-bottom: 1em; }
 
 #deck { width: 4em; height: 6em; position: fixed; top: 0.5em; left: .5em; }
+#deck { border: thin solid black; }
 #deck .card { position: inherit; }
 
 #waste .card { position: fixed; top: 0.5em; }
@@ -291,13 +288,14 @@ function newGame(ndraw) {
 </script>
 </head>
 <body onload="resize();" onresize="resize();">
-<div id="deck"></div>
+<div id="deck">
+	<span id="options">
+	<button onclick="newGame(1);">Draw 1</button>
+	<button onclick="newGame(3);">Draw 3</button>
+	</span>
+</div>
 <div id="waste"></div>
 <div id="foundation"><div></div><div></div><div></div><div></div></div>
 <div id="tableau"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-<div id="options">
-	<button onclick="newGame(1);">Draw 1</button>
-	<button onclick="newGame(3);">Draw 3</button>
-</div>
 </body>
 </html>
