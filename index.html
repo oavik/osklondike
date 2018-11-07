@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <title>Klondike</title>
 <style type="text/css">
+* { user-select: none; }
 body { background: darkgreen; }
 
 div { padding: 0; display: inline-block; font-size: inherit; }
@@ -77,13 +78,13 @@ function resizetableau() {
 }
 
 function dragstart(e) {
-	e.dataTransfer.setData("Text", e.target.id);
+	e.dataTransfer.setData("text", e.target.id);
 	window.dragging = e.target;
 }
 
 function drop(e) {
 	e.preventDefault();
-	var card = document.getElementById(e.dataTransfer.getData("Text"));
+	var card = document.getElementById(e.dataTransfer.getData("text"));
 	var target = e.target;
 	while (target.parentNode.id != "foundation" && target.parentNode.id != "tableau") {
 		target = target.parentNode;
@@ -152,7 +153,7 @@ var Card = function(suit, value) {
 			}
 
 			if (next) {
-				next.moveto(this, loc);
+				next.moveto(this.parentNode, loc);
 			}
 	};
 	c.flip = function() {
