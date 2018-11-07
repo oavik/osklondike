@@ -119,25 +119,45 @@ function drop(e) {
 		target = target.parentNode;
 	}
 
-	if (target.parentNode.id == "foundation") {
-		if (card.value == target.childNodes.length) {
-			if (card.value == 0 || (card.suit == target.lastChild.suit)) {
-				card.moveto(target, "foundation");
-			}
-		}
-		return;
-	} else if (target.parentNode.id == "tableau") {
-		if (target.childNodes.length == 0 && card.value == values.length - 1) {
-			card.moveto(target, "tableau");
-		} else if (target.lastChild.value == card.value + 1 && (target.lastChild.suit - card.suit) % 2 != 0) {
-			card.moveto(target, "tableau");
-		}
-		return;
-	}
+	card.moveto(target);
 }
 
 function dragover(e) {
 	e.preventDefault();
+}
+
+function click(e) {
+	e.preventDefault();
+	var moves = [];
+
+	var foundation = document.getElementById("foundation");
+	for (var i = 0; i < foundation.childNodes.length; i++) {
+		if (this.canmoveto(foundation.childNodes[i])) {
+			moves.push(foundation.childNodes[i]);
+		}
+	}
+
+	var tableau = document.getElementById("tableau");
+	for (var i = 0; i < tableau.childNodes.length; i++) {
+		if (this.canmoveto(tableau.childNodes[i])) {
+			moves.push(tableau.childNodes[i]);
+		}
+	}
+
+	if (moves.length == 1) {
+		this.moveto(moves[0]);
+	}
+
+	if (this.value == 0 && moves.length > 0) {
+		this.moveto(moves[0]);
+	}
+}
+
+function locationof(e) {
+	while (!e.id) {
+		e = e.parentNode;
+	}
+	return e.id;
 }
 
 var Card = function(suit, value) {
@@ -147,44 +167,77 @@ var Card = function(suit, value) {
 	c.value = value;
 	c.draggable = false;
 	c.faceup = true;
-	c.location = "deck";
+
 	c.setmovable = function(movable) {
 		if (movable) {
 			this.draggable = true;
-			this.addEventListener("click", movetofoundation);
+			this.addEventListener("click", click);
 			this.addEventListener("dragstart", dragstart, false);
 		} else {
 			this.draggable = false;
-			this.removeEventListener("click", movetofoundation);
+			this.removeEventListener("click", click);
 			this.removeEventListener("dragstart", dragstart, false);
 		}
 	};
-	c.moveto = function(to, loc) {
-			var next = this.nextSibling;
 
-			if (this.previousSibling) {
-				if (this.previousSibling.faceup) {
-					this.previousSibling.setmovable(true);
-				} else {
-					this.previousSibling.flip();
-				}
+	c.canmoveto = function(to) {
+		if (locationof(to) == "tableau") {
+			if (to.childNodes.length == 0) {
+				return this.value == 12;
 			}
 
-			this.parentNode.removeChild(this);
-			to.appendChild(this);
+			if (this.value == to.lastChild.value - 1) {
+				console.log(this.suit);
+				console.log(to.lastChild.suit);
+				console.log(this.suit - to.lastChild.suit);
+				return Math.abs(this.suit - to.lastChild.suit) % 2 == 1;
+			}
+		}
 
-			this.location = loc;
-			this.style.left = to.style.left;
-			if (loc == "foundation") {
-				this.style.top = document.getElementById("foundation").style.top;
-			} else {
-				resizetableau();
+		if (locationof(to) == "foundation" && !this.nextSibling) {
+			if (to.childNodes.length == 0) {
+				return this.value == 0;
 			}
 
-			if (next) {
-				next.moveto(this.parentNode, loc);
+			if (this.suit == to.lastChild.suit) {
+				return this.value == to.lastChild.value + 1;
 			}
+		}
+
+		return false;
 	};
+
+	c.moveto = function(to) {
+		if (!this.canmoveto(to)) {
+			return;
+		}
+
+		var loc = locationof(to);
+		var next = this.nextSibling;
+
+		if (this.previousSibling) {
+			if (this.previousSibling.faceup) {
+				this.previousSibling.setmovable(true);
+			} else {
+				this.previousSibling.flip();
+			}
+		}
+
+		this.parentNode.removeChild(this);
+		to.appendChild(this);
+
+		this.style.left = to.style.left;
+		if (loc == "foundation") {
+			this.style.top = document.getElementById("foundation").style.top;
+		} else {
+			resizetableau();
+		}
+
+		if (next) {
+			next.moveto(this.parentNode, loc);
+		}
+	};
+
 	c.flip = function() {
 		this.faceup = !this.faceup;
 		if (this.faceup) {
@@ -203,6 +256,7 @@ var Card = function(suit, value) {
 			this.setmovable(false);
 		}
 	};
+
 	c.flip();
 	return c;
 };
@@ -271,7 +325,6 @@ function newGame(ndraw) {
 			var card = deck.lastChild;
 			deck.removeChild(card);
 			tableau.childNodes[t].appendChild(card);
-			card.location = "tableau";
 			card.style.left = tableau.childNodes[t].style.left;
 		}
 		tableau.childNodes[t].lastChild.flip();
