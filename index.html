@@ -83,15 +83,6 @@ var faces = [
 	"SSS<br>SSS<br>SSS", "SSS<br>SSS<br>SSS", "SSS<br>SSS<br>SSS"
 ];
 
-function movetofoundation(e) {
-	var f = document.getElementById("foundation");
-	for (var i = 3; i >= 0; i--) {
-		if (f.childNodes[i].childNodes.length == this.value && (this.value == 0 || this.suit == f.childNodes[i].lastChild.suit)) {
-			this.moveto(f.childNodes[i], "foundation");
-		}
-	}
-}
-
 function resizetableau() {
 	var tab = document.getElementById("tableau");
 	var top = 7.0; //parseFloat(tab.style.top);
