@@ -129,7 +129,15 @@ function dragover(e) {
 function click(e) {
 	e.preventDefault();
 	var moves = [];
-	var tofoundation = false;
+
+	if (this.value != 0) {
+		var tableau = document.getElementById("tableau");
+		for (var i = 0; i < tableau.childNodes.length; i++) {
+			if (this.canmoveto(tableau.childNodes[i])) {
+				moves.push(tableau.childNodes[i]);
+			}
+		}
+	}
 
 	var foundation = document.getElementById("foundation");
 	for (var i = 0; i < foundation.childNodes.length; i++) {
@@ -139,22 +147,7 @@ function click(e) {
 		}
 	}
 
-	var tableau = document.getElementById("tableau");
-	for (var i = 0; i < tableau.childNodes.length; i++) {
-		if (this.canmoveto(tableau.childNodes[i])) {
-			moves.push(tableau.childNodes[i]);
-		}
-	}
-
-	if (moves.length == 1) {
-		this.moveto(moves[0]);
-	}
-
-	if (this.value == 0 && moves.length > 0) {
-		this.moveto(moves[0]);
-	}
-
-	if (!tofoundation && moves.length > 1) {
+	if (moves.length >= 1) {
 		this.moveto(moves[0]);
 	}
 }
