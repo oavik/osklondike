@@ -131,28 +131,7 @@ function dragover(e) {
 
 function click(e) {
 	e.preventDefault();
-	var moves = [];
-
-	if (this.value != 0) {
-		var tableau = document.getElementById("tableau");
-		for (var i = 0; i < tableau.childNodes.length; i++) {
-			if (this.canmoveto(tableau.childNodes[i])) {
-				moves.push(tableau.childNodes[i]);
-			}
-		}
-	}
-
-	var foundation = document.getElementById("foundation");
-	for (var i = 0; i < foundation.childNodes.length; i++) {
-		if (this.canmoveto(foundation.childNodes[i])) {
-			moves.push(foundation.childNodes[i]);
-			tofoundation = true;
-		}
-	}
-
-	if (moves.length >= 1) {
-		this.moveto(moves[0]);
-	}
+	this.trymoving();
 }
 
 function locationof(e) {
@@ -179,6 +158,26 @@ var Card = function(suit, value) {
 			this.draggable = false;
 			this.removeEventListener("click", click);
 			this.removeEventListener("dragstart", dragstart, false);
+		}
+	};
+
+	c.trymoving = function() {
+		if (this.value != 0) {
+			var tableau = document.getElementById("tableau");
+			for (var i = 0; i < tableau.childNodes.length; i++) {
+				if (this.canmoveto(tableau.childNodes[i])) {
+					this.moveto(tableau.childNodes[i]);
+					return;
+				}
+			}
+		}
+
+		var foundation = document.getElementById("foundation");
+		for (var i = 0; i < foundation.childNodes.length; i++) {
+			if (this.canmoveto(foundation.childNodes[i])) {
+				this.moveto(foundation.childNodes[i]);
+				return;
+			}
 		}
 	};
 
