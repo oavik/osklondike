@@ -129,11 +129,13 @@ function dragover(e) {
 function click(e) {
 	e.preventDefault();
 	var moves = [];
+	var tofoundation = false;
 
 	var foundation = document.getElementById("foundation");
 	for (var i = 0; i < foundation.childNodes.length; i++) {
 		if (this.canmoveto(foundation.childNodes[i])) {
 			moves.push(foundation.childNodes[i]);
+			tofoundation = true;
 		}
 	}
 
@@ -149,6 +151,10 @@ function click(e) {
 	}
 
 	if (this.value == 0 && moves.length > 0) {
+		this.moveto(moves[0]);
+	}
+
+	if (!tofoundation && moves.length > 1) {
 		this.moveto(moves[0]);
 	}
 }
@@ -187,9 +193,6 @@ var Card = function(suit, value) {
 			}
 
 			if (this.value == to.lastChild.value - 1) {
-				console.log(this.suit);
-				console.log(to.lastChild.suit);
-				console.log(this.suit - to.lastChild.suit);
 				return Math.abs(this.suit - to.lastChild.suit) % 2 == 1;
 			}
 		}
